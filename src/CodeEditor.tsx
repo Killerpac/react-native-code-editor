@@ -281,7 +281,7 @@ const CodeEditor = (props: PropsWithForwardRef): JSX.Element => {
                 // keyboardType="ascii-capable"
                 editable={!readOnly}
                 testID={`${testID}-text-input`}
-                ref={inputRef}
+                // ref={inputRef}
                 multiline
             />
         </View>
