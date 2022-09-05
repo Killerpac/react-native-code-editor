@@ -169,13 +169,14 @@ const CodeEditor = (props: PropsWithForwardRef): JSX.Element => {
 
     // Negative values move the cursor to the left
     const moveCursor = (current: number, amount: number) => {
-        const newSelection = {
-            start: current + amount,
-            end: current + amount,
-        };
-        inputSelection.current = newSelection;
-        inputRef.current?.setNativeProps({ selection: newSelection });
-        return newSelection;
+        const newPosition = current + amount;
+        inputRef.current?.setNativeProps({
+            selection: {
+                start: newPosition,
+                end: newPosition,
+            },
+        });
+        return newPosition;
     };
 
     const addIndentation = (val: string) => {
@@ -195,7 +196,7 @@ const CodeEditor = (props: PropsWithForwardRef): JSX.Element => {
                 : indentSize;
             indentation += '\n' + Indentation.createIndentString(addedIndentionSize);
             // Don't update local cursor position to insert all new changes in one insert call
-            moveCursor(cursorPosition, addedIndentionSize);
+            moveCursor(cursorPosition, -addedIndentionSize);
         }
 
         return Strings.insertStringAt(val, cursorPosition, indentation);
@@ -277,10 +278,8 @@ const CodeEditor = (props: PropsWithForwardRef): JSX.Element => {
                 autoComplete="off"
                 autoCorrect={false}
                 autoFocus={autoFocus}
-                // keyboardType="ascii-capable"
                 editable={!readOnly}
                 testID={`${testID}-text-input`}
-                // ref={inputRef}
                 multiline
             />
         </View>
