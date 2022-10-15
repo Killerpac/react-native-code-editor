@@ -153,10 +153,7 @@ const CodeEditor = (props: PropsWithForwardRef): JSX.Element => {
     const [value, setValue] = useState<string>(initialValue);
     const highlighterRef = useRef<ScrollView>(null);
     const inputRef = useRef<TextInput>(null);
-    const [inputSelection, setInputSelection] = useState<TextInputSelectionType>({
-        start: 0,
-        end: 0,
-    });
+    const inputSelection = useRef<TextInputSelectionType>({ start: 0, end: 0 });
 
     // Only when line numbers are showing
     const lineNumbersPadding = showLineNumbers ? 1.75 * fontSize : undefined;
@@ -173,16 +170,17 @@ const CodeEditor = (props: PropsWithForwardRef): JSX.Element => {
     // Negative values move the cursor to the left
     const moveCursor = (current: number, amount: number) => {
         const newPosition = current + amount;
-        setInputSelection({
-            start: newPosition,
-            end: newPosition,
+        inputRef.current?.setNativeProps({
+            selection: {
+                start: newPosition,
+                end: newPosition,
+            },
         });
         return newPosition;
     };
 
     const addIndentation = (val: string) => {
-        let cursorPosition = inputSelection.start - 1;
-
+        let cursorPosition = inputSelection.current.start - 1;
         // All lines before the cursor
         const preLines = val.substring(0, cursorPosition).split('\n');
         const indentSize = Indentation.getSuggestedIndentSize(preLines);
@@ -204,8 +202,8 @@ const CodeEditor = (props: PropsWithForwardRef): JSX.Element => {
     };
 
     const addClosingBrace = (val: string, key: string) => {
-        let cursorPosition = inputSelection.start;
-        cursorPosition = moveCursor(cursorPosition, 1);
+        let cursorPosition = inputSelection.current.start;
+        cursorPosition = moveCursor(cursorPosition, -1);
         return Strings.insertStringAt(val, cursorPosition, Braces.getCloseBrace(key));
     };
 
@@ -241,8 +239,9 @@ const CodeEditor = (props: PropsWithForwardRef): JSX.Element => {
     };
 
     const handleSelectionChange = (e: NativeSyntheticEvent<TextInputSelectionChangeEventData>) => {
-        setInputSelection(e.nativeEvent.selection);
+        inputSelection.current = e.nativeEvent.selection;
     };
+
     return (
         <View style={{ width, height, marginTop, marginBottom }} testID={testID}>
             <SyntaxHighlighter
@@ -281,7 +280,7 @@ const CodeEditor = (props: PropsWithForwardRef): JSX.Element => {
                 keyboardType="ascii-capable"
                 editable={!readOnly}
                 testID={`${testID}-text-input`}
-                ref={inputRef}
+                // ref={inputRef}
                 multiline
             />
         </View>
