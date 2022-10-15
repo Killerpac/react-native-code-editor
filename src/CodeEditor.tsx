@@ -153,7 +153,10 @@ const CodeEditor = (props: PropsWithForwardRef): JSX.Element => {
     const [value, setValue] = useState<string>(initialValue);
     const highlighterRef = useRef<ScrollView>(null);
     const inputRef = useRef<TextInput>(null);
-    const [inputSelectionNew, setInputSelectionNew] = useState({start: 0, end: 0});
+    const [inputSelection, setInputSelection] = useState<TextInputSelectionType>({
+        start: 0,
+        end: 0,
+    });
 
     // Only when line numbers are showing
     const lineNumbersPadding = showLineNumbers ? 1.75 * fontSize : undefined;
@@ -170,7 +173,7 @@ const CodeEditor = (props: PropsWithForwardRef): JSX.Element => {
     // Negative values move the cursor to the left
     const moveCursor = (current: number, amount: number) => {
         const newPosition = current + amount;
-        setInputSelectionNew({
+        setInputSelection({
             start: newPosition,
             end: newPosition,
         });
@@ -178,7 +181,7 @@ const CodeEditor = (props: PropsWithForwardRef): JSX.Element => {
     };
 
     const addIndentation = (val: string) => {
-        let cursorPosition = inputSelectionNew.start - 1;
+        let cursorPosition = inputSelection.start - 1;
 
         // All lines before the cursor
         const preLines = val.substring(0, cursorPosition).split('\n');
@@ -201,7 +204,7 @@ const CodeEditor = (props: PropsWithForwardRef): JSX.Element => {
     };
 
     const addClosingBrace = (val: string, key: string) => {
-        let cursorPosition = inputSelectionNew.start;
+        let cursorPosition = inputSelection.start;
         cursorPosition = moveCursor(cursorPosition, 1);
         return Strings.insertStringAt(val, cursorPosition, Braces.getCloseBrace(key));
     };
@@ -238,9 +241,8 @@ const CodeEditor = (props: PropsWithForwardRef): JSX.Element => {
     };
 
     const handleSelectionChange = (e: NativeSyntheticEvent<TextInputSelectionChangeEventData>) => {
-        inputSelectionNew.current = e.nativeEvent.selection;
+        setInputSelection(e.nativeEvent.selection);
     };
-
     return (
         <View style={{ width, height, marginTop, marginBottom }} testID={testID}>
             <SyntaxHighlighter
