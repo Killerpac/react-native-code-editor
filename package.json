@@ -35,6 +35,7 @@
     ]
   },
   "dependencies": {
+    "react-native-code-editor-fork": "^1.0.9",
     "react-syntax-highlighter": "^15.4.5"
   },
   "peerDependencies": {
