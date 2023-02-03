@@ -171,12 +171,12 @@ const CodeEditor = (props: PropsWithForwardRef): JSX.Element => {
     const moveCursor = (current: number, amount: number) => {
         const newPosition = current + amount;
         inputRef.current?.focus();
-        inputRef.current?.onFocus = () => {
-          inputRef.current?.setSelection(newPosition, newPosition);
-        };
-        inputRef.current?.onBlur = () => {
-          inputRef.current?.blur();
-        };
+        setTimeout(() => {
+            inputRef.current?.setNativeProps({
+                selectionStart: newPosition,
+                selectionEnd: newPosition
+              });
+        }, 0);
         return newPosition;
       };
 
@@ -281,7 +281,7 @@ const CodeEditor = (props: PropsWithForwardRef): JSX.Element => {
                 keyboardType="ascii-capable"
                 editable={!readOnly}
                 testID={`${testID}-text-input`}
-                // ref={inputRef}
+                ref={inputRef}
                 multiline
             />
         </View>
